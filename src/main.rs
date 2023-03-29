@@ -32,6 +32,7 @@ fn main() {
         if line.is_empty() {
             writeln!(current_file, "</ul>").unwrap();
             writeln!(current_file, "</div>").unwrap();
+
             page += 1;
             in_a_page = false;
         } else {
@@ -45,15 +46,15 @@ fn main() {
     }
     writeln!(current_file, "</ul>").unwrap();
     let mut end_page = File::create(END_PAGE_PATH).unwrap();
-    writeln!(
-        end_page,
-        "<head><link rel='stylesheet' href='{}'></head>",
-        CSS_FILE_PATH
-    )
-    .unwrap();
+    write_html_headers(&mut end_page);
 
     let last_page_link = format!("page_{}.html", page);
-    writeln!(end_page, "<a href='{}'>previous</a>", last_page_link).unwrap();
+    writeln!(
+        end_page,
+        "<a id='previous' href='{}'>previous</a>",
+        last_page_link
+    )
+    .unwrap();
     writeln!(end_page, "<h1>FIN</h1>").unwrap();
 
     println!("Wrote out {} pages", page);
@@ -87,32 +88,48 @@ fn is_last_page(lines: &Vec<&str>, current_line_index: usize) -> bool {
     is_last_page
 }
 
+fn write_html_headers(file: &mut File) {
+    writeln!(file, "<head>").unwrap();
+    writeln!(file, "<link rel='stylesheet' href='{}'>", CSS_FILE_PATH).unwrap();
+    writeln!(file, "<script src='navigate.js'></script>").unwrap();
+
+    writeln!(file, "</head>").unwrap();
+}
+
 fn create_html_page(page: u32, is_last_page: bool) -> std::io::Result<File> {
     let new_file_path = format!("page_{}.html", page);
     let previous_page_link = format!("page_{}.html", page - 1);
     let next_page_link = format!("page_{}.html", page + 1);
 
     let mut current_file = File::create(new_file_path)?;
-    writeln!(
-        current_file,
-        "<head><link rel='stylesheet' href='{}'></head>",
-        CSS_FILE_PATH
-    )
-    .unwrap();
+
+    write_html_headers(&mut current_file);
+
     if page > 1 {
         writeln!(
             current_file,
-            "<a href='{}'>previous</a>",
+            "<a id='previous' href='{}'>previous</a>",
             previous_page_link
         )
         .unwrap();
     }
 
     if is_last_page {
-        writeln!(current_file, "<a href='{}'>next</a>", END_PAGE_PATH).unwrap();
+        writeln!(
+            current_file,
+            "<a id='next' href='{}'>next</a>",
+            END_PAGE_PATH
+        )
+        .unwrap();
     } else {
-        writeln!(current_file, "<a href='{}'>next</a>", next_page_link).unwrap();
+        writeln!(
+            current_file,
+            "<a id='next' href='{}'>next</a>",
+            next_page_link
+        )
+        .unwrap();
     }
+
     writeln!(current_file, "<br>").unwrap();
     writeln!(current_file, "<div class='content'>").unwrap();
     writeln!(current_file, "<ul>").unwrap();
