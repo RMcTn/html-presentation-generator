@@ -31,6 +31,7 @@ fn main() {
         let line = &lines[i];
         if line.is_empty() {
             writeln!(current_file, "</ul>").unwrap();
+            writeln!(current_file, "</div>").unwrap();
             page += 1;
             in_a_page = false;
         } else {
@@ -113,6 +114,7 @@ fn create_html_page(page: u32, is_last_page: bool) -> std::io::Result<File> {
         writeln!(current_file, "<a href='{}'>next</a>", next_page_link).unwrap();
     }
     writeln!(current_file, "<br>").unwrap();
+    writeln!(current_file, "<div class='content'>").unwrap();
     writeln!(current_file, "<ul>").unwrap();
     return Ok(current_file);
 }
