@@ -99,7 +99,7 @@ fn create_html_page(page: u32, is_last_page: bool) -> std::io::Result<File> {
         CSS_FILE_PATH
     )
     .unwrap();
-    if page > 0 {
+    if page > 1 {
         writeln!(
             current_file,
             "<a href='{}'>previous</a>",
