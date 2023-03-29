@@ -1,3 +1,4 @@
+use std::env;
 use std::fs::*;
 use std::io::*;
 
@@ -6,11 +7,18 @@ const END_PAGE_PATH: &str = "end.html";
 fn main() {
     // How long till this just becomes a HTML template language
 
+    let args: Vec<String> = env::args().collect();
+    dbg!(&args);
+    if args.len() != 2 {
+        // TODO(reece): Update this message with an actual name
+        eprintln!("USAGE: cargo run <path_to_file>");
+        return;
+    }
+
     // TODO(reece): Link a CSS File
     // TODO(reece): Better layout
-    // TODO(reece): get file name from argument
     // TODO(reece): add images
-    let contents = std::fs::read_to_string("stuff.txt").unwrap();
+    let contents = std::fs::read_to_string(&args[1]).unwrap();
     let mut lines: Vec<&str> = contents.split('\n').collect();
 
     chomp_trailing_empty_lines(&mut lines);
@@ -18,7 +26,7 @@ fn main() {
     let mut page = 1;
 
     let mut in_a_page = false;
-    let mut current_file = File::create("page_0.html").unwrap();
+    let mut current_file = File::create("page_1.html").unwrap();
     for i in 0..lines.len() {
         let line = &lines[i];
         if line.is_empty() {
