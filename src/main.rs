@@ -3,6 +3,7 @@ use std::fs::*;
 use std::io::*;
 
 const END_PAGE_PATH: &str = "end.html";
+const CSS_FILE_PATH: &str = "styles.css";
 
 fn main() {
     // How long till this just becomes a HTML template language
@@ -15,7 +16,6 @@ fn main() {
         return;
     }
 
-    // TODO(reece): Link a CSS File
     // TODO(reece): Better layout
     // TODO(reece): add images
     let contents = std::fs::read_to_string(&args[1]).unwrap();
@@ -36,32 +36,20 @@ fn main() {
         } else {
             if !in_a_page {
                 in_a_page = true;
-                let new_file_path = format!("page_{}.html", page);
-                let previous_page_link = format!("page_{}.html", page - 1);
-                let next_page_link = format!("page_{}.html", page + 1);
-                current_file = File::create(new_file_path).unwrap();
-                if page > 0 {
-                    writeln!(
-                        current_file,
-                        "<a href='{}'>previous</a>",
-                        previous_page_link
-                    )
-                    .unwrap();
-                }
-
-                if is_last_page(&lines, i) {
-                    writeln!(current_file, "<a href='{}'>next</a>", END_PAGE_PATH).unwrap();
-                } else {
-                    writeln!(current_file, "<a href='{}'>next</a>", next_page_link).unwrap();
-                }
-                writeln!(current_file, "<br>").unwrap();
-                writeln!(current_file, "<ul>").unwrap();
+                let is_last_page = is_last_page(&lines, i);
+                current_file = create_html_page(page, is_last_page).unwrap();
             }
             writeln!(current_file, "<li>{}</li>", line).unwrap();
         }
     }
     writeln!(current_file, "</ul>").unwrap();
     let mut end_page = File::create(END_PAGE_PATH).unwrap();
+    writeln!(
+        end_page,
+        "<head><link rel='stylesheet' href='{}'></head>",
+        CSS_FILE_PATH
+    )
+    .unwrap();
 
     let last_page_link = format!("page_{}.html", page);
     writeln!(end_page, "<a href='{}'>previous</a>", last_page_link).unwrap();
@@ -96,4 +84,35 @@ fn is_last_page(lines: &Vec<&str>, current_line_index: usize) -> bool {
         }
     }
     is_last_page
+}
+
+fn create_html_page(page: u32, is_last_page: bool) -> std::io::Result<File> {
+    let new_file_path = format!("page_{}.html", page);
+    let previous_page_link = format!("page_{}.html", page - 1);
+    let next_page_link = format!("page_{}.html", page + 1);
+
+    let mut current_file = File::create(new_file_path)?;
+    writeln!(
+        current_file,
+        "<head><link rel='stylesheet' href='{}'></head>",
+        CSS_FILE_PATH
+    )
+    .unwrap();
+    if page > 0 {
+        writeln!(
+            current_file,
+            "<a href='{}'>previous</a>",
+            previous_page_link
+        )
+        .unwrap();
+    }
+
+    if is_last_page {
+        writeln!(current_file, "<a href='{}'>next</a>", END_PAGE_PATH).unwrap();
+    } else {
+        writeln!(current_file, "<a href='{}'>next</a>", next_page_link).unwrap();
+    }
+    writeln!(current_file, "<br>").unwrap();
+    writeln!(current_file, "<ul>").unwrap();
+    return Ok(current_file);
 }
