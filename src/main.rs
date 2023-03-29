@@ -4,9 +4,12 @@ use std::io::*;
 const END_PAGE_PATH: &str = "end.html";
 
 fn main() {
+    // How long till this just becomes a HTML template language
+
     // TODO(reece): Link a CSS File
     // TODO(reece): Better layout
     // TODO(reece): get file name from argument
+    // TODO(reece): add images
     let contents = std::fs::read_to_string("stuff.txt").unwrap();
     let mut lines: Vec<&str> = contents.split('\n').collect();
 
@@ -38,9 +41,7 @@ fn main() {
                     .unwrap();
                 }
 
-                let last_line = lines.last().unwrap();
-
-                if is_last_page(&lines, i, last_line) {
+                if is_last_page(&lines, i) {
                     writeln!(current_file, "<a href='{}'>next</a>", END_PAGE_PATH).unwrap();
                 } else {
                     writeln!(current_file, "<a href='{}'>next</a>", next_page_link).unwrap();
@@ -73,14 +74,15 @@ fn chomp_trailing_empty_lines(lines: &mut Vec<&str>) {
     lines.truncate(lines_to_keep);
 }
 
-fn is_last_page(lines: &Vec<&str>, current_line_index: usize, last_line: &str) -> bool {
+fn is_last_page(lines: &Vec<&str>, current_line_index: usize) -> bool {
     let mut is_last_page = false;
     for j in current_line_index..lines.len() {
         let next_line = &lines[j];
         if next_line.is_empty() {
             break;
         }
-        if *next_line == last_line {
+        let last_line = lines.last().unwrap();
+        if *next_line == *last_line {
             is_last_page = true;
             break;
         }
