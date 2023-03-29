@@ -51,6 +51,7 @@ fn main() {
             writeln!(current_file, "<li>{}</li>", line).unwrap();
         }
     }
+    writeln!(current_file, "</ul>").unwrap();
     let mut end_page = File::create(END_PAGE_PATH).unwrap();
 
     let last_page_link = format!("page_{}.html", page);
