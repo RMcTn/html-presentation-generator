@@ -6,6 +6,8 @@ h1 {
 	display: flex;
 	justify-content: center;
 	align-content: center;
+	padding-left: 20%;
+	padding-right: 20%;
 }
 
 li {
