@@ -11,8 +11,12 @@ const OUTPUT_DIR: &str = "output/";
 fn main() {
     // How long till this just becomes a HTML template language
 
+    println!(
+        "Make sure there's a {} file and a {} file available in whatever directory this is run in! Feel free to edit the styles to your heart's content",
+        CSS_FILE_PATH, JAVASCRIPT_FILE_PATH
+    );
+
     let args: Vec<String> = env::args().collect();
-    dbg!(&args);
     if args.len() != 2 {
         // TODO(reece): Update this message with an actual name
         eprintln!("USAGE: cargo run <path_to_file>");

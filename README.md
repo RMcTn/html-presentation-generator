@@ -11,7 +11,16 @@ See the [example file](example/example.txt) for what the generator file will loo
 See the [example presentation](example/page_1.html) for the goods.  
 See [format](#format) for a spec.
 
-The presentation files will be created in the same folder that the program was run in.
+Make sure there are the `styles.css` and `navigate.js` files in the directory that the program was run in.  
+You can edit the `styles.css` file all you like, but the HTML tags used in the output body are:
+- `<li>`
+- `<ul>`
+- `<a>`
+- `<div>`
+- `<br>`
+- `<h1>`
+
+The presentation files will be created in the output/ folder that the program was run in.
 ```
 cargo run <path-to-presentation-file>
 ```
