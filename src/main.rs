@@ -1,9 +1,12 @@
 use std::env;
+use std::fs;
 use std::fs::*;
 use std::io::*;
 
 const END_PAGE_PATH: &str = "end.html";
 const CSS_FILE_PATH: &str = "styles.css";
+const JAVASCRIPT_FILE_PATH: &str = "navigate.js";
+const OUTPUT_DIR: &str = "output/";
 
 fn main() {
     // How long till this just becomes a HTML template language
@@ -16,6 +19,8 @@ fn main() {
         return;
     }
 
+    let _ = fs::create_dir(OUTPUT_DIR);
+
     // TODO(reece): Better layout
     // TODO(reece): add images
     let contents = std::fs::read_to_string(&args[1]).unwrap();
@@ -26,7 +31,7 @@ fn main() {
     let mut page = 1;
 
     let mut in_a_page = false;
-    let mut current_file = File::create("page_1.html").unwrap();
+    let mut current_file = File::create(OUTPUT_DIR.to_string() + "page_1.html").unwrap();
     for i in 0..lines.len() {
         let line = &lines[i];
         if line.is_empty() {
@@ -45,7 +50,7 @@ fn main() {
         }
     }
     writeln!(current_file, "</ul>").unwrap();
-    let mut end_page = File::create(END_PAGE_PATH).unwrap();
+    let mut end_page = File::create(OUTPUT_DIR.to_string() + END_PAGE_PATH).unwrap();
     write_html_headers(&mut end_page);
 
     let last_page_link = format!("page_{}.html", page);
@@ -58,6 +63,16 @@ fn main() {
     writeln!(end_page, "<h1>FIN</h1>").unwrap();
 
     println!("Wrote out {} pages", page);
+
+    if let Err(e) = fs::copy(CSS_FILE_PATH, OUTPUT_DIR.to_string() + CSS_FILE_PATH) {
+        eprintln!("Couldn't copy CSS file to {} folder: {}", OUTPUT_DIR, e);
+    }
+    if let Err(e) = fs::copy(
+        JAVASCRIPT_FILE_PATH,
+        OUTPUT_DIR.to_string() + JAVASCRIPT_FILE_PATH,
+    ) {
+        eprintln!("Couldn't copy JS file to {} folder: {}", OUTPUT_DIR, e);
+    }
 }
 
 fn chomp_trailing_empty_lines(lines: &mut Vec<&str>) {
@@ -91,13 +106,13 @@ fn is_last_page(lines: &Vec<&str>, current_line_index: usize) -> bool {
 fn write_html_headers(file: &mut File) {
     writeln!(file, "<head>").unwrap();
     writeln!(file, "<link rel='stylesheet' href='{}'>", CSS_FILE_PATH).unwrap();
-    writeln!(file, "<script src='navigate.js'></script>").unwrap();
+    writeln!(file, "<script src='{}'></script>", JAVASCRIPT_FILE_PATH).unwrap();
 
     writeln!(file, "</head>").unwrap();
 }
 
 fn create_html_page(page: u32, is_last_page: bool) -> std::io::Result<File> {
-    let new_file_path = format!("page_{}.html", page);
+    let new_file_path = format!("{}page_{}.html", OUTPUT_DIR, page);
     let previous_page_link = format!("page_{}.html", page - 1);
     let next_page_link = format!("page_{}.html", page + 1);
 
